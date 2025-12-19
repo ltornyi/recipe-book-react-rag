@@ -2,10 +2,10 @@ https://mui.com/x/react-data-grid/
 
 steps
 =====
-1. install LTS node@24
+1. install node@22
 
-    brew install node@24
-    echo 'export PATH="/opt/homebrew/opt/node@24/bin:$PATH"' >> ~/.zshrc
+    brew install node@22
+    echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' >> ~/.zshrc
 
 2. create react router project
 
@@ -36,3 +36,20 @@ to package.json and also change
     ssr: true
 
 in `react-router.config`
+
+5. local development
+
+    cd api
+    npm run build
+    func host start
+
+in a separate terminal
+
+    cd ui/recipe-book
+    npm run dev
+
+in a separate terminal
+
+    swa start http://localhost:5173/ --api-devserver-url http://localhost:7071
+
+SWA is available at `http://localhost:4280/`. 
