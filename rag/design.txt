@@ -1,0 +1,19 @@
+ai search index schema
+{
+  "name": "recipes-index",
+  "fields": [
+    { "name": "id", "type": "Edm.String", "key": true },
+    { "name": "title", "type": "Edm.String", "searchable": true },
+    { "name": "ingredients", "type": "Edm.String", "searchable": true },
+    { "name": "steps", "type": "Edm.String", "searchable": true },
+    {
+      "name": "embedding",
+      "type": "Collection(Edm.Single)",
+      "searchable": true,
+      "vectorSearchDimensions": 1536,
+      "vectorSearchProfile": "default"
+    }
+  ]
+}
+
+

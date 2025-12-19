@@ -1,0 +1,48 @@
+SWA headers
+x-ms-client-principal-id → user_id
+x-ms-client-principal-name
+x-ms-client-principal-idp
+
+https://docs.azure.cn/en-us/app-service/configure-authentication-provider-aad?tabs=workforce-configuration
+
+GET    /api/recipes
+GET    /api/recipes/{id}
+POST   /api/recipes
+PUT    /api/recipes/{id}
+DELETE /api/recipes/{id}
+
+query
+?q=chicken
+&sort=title
+&dir=asc
+&page=1
+&page_size=20
+&title=Soup
+&cuisine=Italian
+&is_public=true
+
+SQL
+SELECT
+    recipe_id,
+    title,
+    description,
+    ingredients,
+    cuisine,
+    created_at,
+    updated_at,
+    COUNT(*) OVER() AS total_count
+FROM dbo.recipes
+WHERE
+    (@q IS NULL OR (
+        title LIKE '%' + @q + '%' OR
+        description LIKE '%' + @q + '%' OR
+        ingredients LIKE '%' + @q + '%'
+    ))
+    AND (@cuisine IS NULL OR cuisine = @cuisine)
+    AND (is_public = 1 OR created_by_user_id = @user_id)
+ORDER BY
+    CASE WHEN @sort = 'title' AND @dir = 'asc' THEN title END ASC,
+    CASE WHEN @sort = 'title' AND @dir = 'desc' THEN title END DESC,
+    created_at DESC
+OFFSET @offset ROWS
+FETCH NEXT @page_size ROWS ONLY;
