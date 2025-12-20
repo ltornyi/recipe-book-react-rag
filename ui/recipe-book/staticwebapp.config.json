@@ -5,7 +5,7 @@
       "allowedRoles": ["authenticated"]
     },
     {
-      "route": "/success",
+      "route": "/home/*",
       "allowedRoles": ["authenticated"]
     },
     {

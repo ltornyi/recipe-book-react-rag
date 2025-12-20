@@ -46,3 +46,8 @@ Start the function app locally
 
 Endpoints are available under `http://localhost:7071/api` but because of the SWA authentication checks, you should leverage the
 SWA emulator, see details under `ui`. Function endpints will be available under `http://localhost:4280/api`.    
+
+## Deploy to Azure
+
+Deployment is automatic with Github actions when changes are pushed or merged into the main branch. After the initial deployment,
+set up the five environment variables for the static app in Azure portal under Settings -> Environment variables.

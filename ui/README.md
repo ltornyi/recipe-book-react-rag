@@ -1,5 +1,3 @@
-https://mui.com/x/react-data-grid/
-
 steps
 =====
 1. install node@22
@@ -39,6 +37,12 @@ in `react-router.config`
 
 5. local development
 
+Create a `.env` file in the `ui/recipe-book` folder and add the allowed domain as an environment variable:
+
+    VITE_ALLOWED_EMAIL_DOMAIN=mycompanydomain.com
+
+If should be the same as the `ALLOWED_EMAIL_DOMAIN` configured for the API.
+
 Run the function app locally:
 
     cd api
@@ -54,3 +58,9 @@ Start the Static Web App emulator in a new terminal:
     swa start http://localhost:5173/ --api-devserver-url http://localhost:7071
 
 SWA is available at `http://localhost:4280/`. 
+
+6. Deploy to Azure
+
+Deployment is automatic with Github actions when changes are pushed or merged into the main branch. Set up the
+`VITE_ALLOWED_EMAIL_DOMAIN` as a repository variable (the github action references it). Go to
+repository -> Settings -> Secrets and variables -> Actions -> Variables, and click **New repository variable**.
