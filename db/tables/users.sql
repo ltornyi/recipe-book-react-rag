@@ -1,4 +1,4 @@
-CREATE TABLE dbo.users (
+CREATE TABLE recipe_book.users (
     user_id            NVARCHAR(128) NOT NULL,   -- Static Web Apps userId
     identity_provider  NVARCHAR(50)  NOT NULL,   -- e.g. 'aad'
     display_name       NVARCHAR(256) NULL,

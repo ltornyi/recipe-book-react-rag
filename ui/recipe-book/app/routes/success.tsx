@@ -11,29 +11,29 @@ export function meta({}: Route.MetaArgs) {
 export default function Success() {
 
   const [userId, setUserId] = useState(null);
-  const [hello, setHello] = useState('');
+  const [dbTime, setDbTime] = useState('');
 
   useEffect(() => {    
     fetch('/.auth/me')
       .then(response => response.json())
       .then(data => {
-        console.log(data);
+        console.log('.auth/me response', data);
         setUserId(data.clientPrincipal.userId);
     });
   }, []);
 
   useEffect(() => {    
-    fetch(`/api/hello?name=${encodeURIComponent(userId || '')}`)
-      .then(response => response.text())
+    fetch('/api/db-time')
+      .then(response => response.json())
       .then(data => {
-        console.log(data);
-        setHello(data);
+        console.log('api/db-time response', data);
+        setDbTime(data.databaseTimeUtc);
     });
   }, [userId]);
 
   return <div>
         <p>Success, userId:{userId}</p>
-        <p>message:{hello}</p>
+        <p>dbTime:{dbTime}</p>
         <a href="/logout">Logout</a>
     </div>;
 }

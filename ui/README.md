@@ -39,16 +39,17 @@ in `react-router.config`
 
 5. local development
 
-    cd api
-    npm run build
-    func host start
+Run the function app locally:
 
-in a separate terminal
+    cd api
+    npm start
+
+Start the frontend dev server in a new terminal:
 
     cd ui/recipe-book
     npm run dev
 
-in a separate terminal
+Start the Static Web App emulator in a new terminal:
 
     swa start http://localhost:5173/ --api-devserver-url http://localhost:7071
 
