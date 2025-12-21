@@ -44,7 +44,7 @@ export default function RecipesPage() {
       setAllRecipes(res.items);
     } catch (err: any) {
       console.error('Failed to load recipes', err);
-      setError(err ?? 'Failed to load recipes');
+      setError(JSON.stringify(err) ?? 'Failed to load recipes');
       setAllRecipes([]);
     } finally {
       setLoading(false);

@@ -23,7 +23,7 @@ export default function AppHeader() {
 
         {user?.userDetails && (
           <Typography variant="body2" sx={{ mr: 2, fontStyle: "italic" }}>
-            {user.userDetails}
+            {user.userDetails}:{user.userId}
           </Typography>
         )}
 
