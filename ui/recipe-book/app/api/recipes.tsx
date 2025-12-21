@@ -107,3 +107,14 @@ export async function updateRecipe(id: number, body: Partial<CreateRecipeBody>):
     throw new Error(`Update recipe failed: ${res.status} ${res.statusText} ${text}`);
   }
 }
+
+export async function deleteRecipe(id: number): Promise<void> {
+  const res = await fetch(`/api/recipes/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Delete recipe failed: ${res.status} ${res.statusText} ${text}`);
+  }
+}

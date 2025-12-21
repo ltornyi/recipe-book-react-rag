@@ -23,9 +23,10 @@ export interface RecipeFormDialogProps {
   initial?: RecipeFormValues | null;
   onClose: () => void;
   onSave: (values: RecipeFormValues) => Promise<void>;
+  onDelete?: (id: number) => Promise<void>;
 }
 
-export default function RecipeFormDialog({ open, initial, onClose, onSave }: RecipeFormDialogProps) {
+export default function RecipeFormDialog({ open, initial, onClose, onSave, onDelete }: RecipeFormDialogProps) {
   const [values, setValues] = useState<RecipeFormValues>({ title: '', ingredients: '', steps: '', is_public: true });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -68,6 +69,19 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave }: Rec
     }
   };
 
+  const handleDelete = async () => {
+    setSaving(true);
+    try {
+      await onDelete?.(values.recipe_id!);
+      onClose();
+    } catch (err) {
+      console.error('Delete failed', err);
+      // ideally show error to user
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>{values.recipe_id ? 'Edit Recipe' : 'New Recipe'}</DialogTitle>
@@ -89,6 +103,9 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave }: Rec
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={saving || loading}>Cancel</Button>
+        {values.recipe_id && (
+            <Button onClick={handleDelete} color="error" disabled={saving || loading || !values.recipe_id}>Delete</Button>
+        )}
         <Button onClick={handleSave} variant="contained" disabled={saving || loading || !values.title || !values.ingredients || !values.steps}>{saving ? 'Saving...' : 'Save'}</Button>
       </DialogActions>
     </Dialog>

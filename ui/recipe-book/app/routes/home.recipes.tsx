@@ -7,10 +7,11 @@ import {
   Typography,
   CircularProgress,
   Button,
+  Alert,
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef } from '@mui/x-data-grid';
-import {fetchRecipes, createRecipe, updateRecipe } from "../api/recipes";
+import {fetchRecipes, createRecipe, updateRecipe, deleteRecipe } from "../api/recipes";
 import type { RecipeSummary } from "../api/recipes";
 import RecipeFormDialog from "../components/RecipeFormDialog";
 
@@ -23,6 +24,7 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(false);
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -33,14 +35,16 @@ export default function RecipesPage() {
   // Fetch recipes from server with search query
   const loadRecipes = useCallback(async (search?: string) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetchRecipes({ 
         pageSize: 10000,
         q: search || undefined
       });
       setAllRecipes(res.items);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load recipes', err);
+      setError(err ?? 'Failed to load recipes');
       setAllRecipes([]);
     } finally {
       setLoading(false);
@@ -85,6 +89,22 @@ export default function RecipesPage() {
     }
   };
 
+  const handleDelete = async (recipeId: number) => {
+    // Not implemented yet
+    try {
+      await deleteRecipe(recipeId);
+    } catch (err) {
+      console.error('Delete failed', err);
+      throw err;
+    }
+    // Reload recipes with current search
+    await loadRecipes(debouncedQ);
+  }
+
+  const handleRetry = async () => {
+    await loadRecipes(debouncedQ);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h4" gutterBottom>Recipe maintenance</Typography>
@@ -96,6 +116,17 @@ export default function RecipesPage() {
           <Button variant="contained" onClick={() => { setEditing(null); setDialogOpen(true); }}>New Recipe</Button>
         </Box>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}
+            action={
+                <Button size="small" onClick={handleRetry}>Retry</Button>
+            }
+        >
+            {error}
+        </Alert>
+        )}
+
 
       <Paper style={{ height: 650 }}>
         <DataGrid
@@ -119,6 +150,7 @@ export default function RecipesPage() {
         initial={editing}
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
+        onDelete={handleDelete}
       />
     </Box>
   );
