@@ -1,4 +1,5 @@
-import { HttpRequest } from "@azure/functions";
+import { HttpRequest, HttpResponseInit } from "@azure/functions";
+import { forbidden, serverError, unauthorized } from "./responseHelpers";
 
 export interface AuthenticatedUser {
     userId: string;
@@ -37,5 +38,21 @@ export function requireAllowedUser(req: HttpRequest): AuthenticatedUser {
 export class AuthError extends Error {
     constructor(public status: number, message: string) {
         super(message);
+    }
+}
+
+/**
+ * Helper to extract user from auth header, returning HttpResponseInit on error
+ */
+export function tryGetUser(request: HttpRequest): { user: AuthenticatedUser | null; error?: HttpResponseInit } {
+    try {
+        const user = requireAllowedUser(request);
+        return { user };
+    } catch (e) {
+        if (e instanceof AuthError) {
+            if (e.status === 403) return { user: null, error: forbidden(e.message) };
+            return { user: null, error: unauthorized(e.message) };
+        }
+        return { user: null, error: serverError() };
     }
 }

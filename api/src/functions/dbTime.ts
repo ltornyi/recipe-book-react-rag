@@ -1,6 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { getSqlPool } from "../shared/sqlPool";
-import { requireAllowedUser, AuthError } from "../shared/auth";
+import { requireAllowedUser, AuthError, tryGetUser } from "../shared/auth";
 
 /**
  * GET /api/db-time
@@ -10,7 +10,8 @@ import { requireAllowedUser, AuthError } from "../shared/auth";
 export async function dbTime(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     try {
         // Extract and validate authenticated user from SWA headers
-        const user = requireAllowedUser(request);
+        const { user, error } = tryGetUser(request);
+        if (error) return error;
 
         // Get pooled SQL connection
         const pool = await getSqlPool(context);
@@ -27,11 +28,6 @@ export async function dbTime(request: HttpRequest, context: InvocationContext): 
             }
         };
     } catch (err: any) {
-        if (err instanceof AuthError) {
-            // Return 401/403 for auth errors
-            return { status: err.status, jsonBody: { error: err.message } };
-        }
-
         // Log unexpected errors and return 500
         context.error("Unhandled error in db-time", err);
         return { status: 500, jsonBody: { error: "Internal server error" } };
