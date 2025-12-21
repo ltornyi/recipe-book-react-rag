@@ -44,7 +44,7 @@ export default function RecipesPage() {
       setAllRecipes(res.items);
     } catch (err: any) {
       console.error('Failed to load recipes', err);
-      setError(JSON.stringify(err) ?? 'Failed to load recipes');
+      setError(err.message || 'Failed to load recipes');
       setAllRecipes([]);
     } finally {
       setLoading(false);
@@ -90,7 +90,6 @@ export default function RecipesPage() {
   };
 
   const handleDelete = async (recipeId: number) => {
-    // Not implemented yet
     try {
       await deleteRecipe(recipeId);
     } catch (err) {

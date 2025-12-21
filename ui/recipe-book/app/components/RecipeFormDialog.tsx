@@ -10,6 +10,7 @@ import {
   Switch,
   Box,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import type { CreateRecipeBody } from '../api/recipes';
 import { getRecipe } from '../api/recipes';
@@ -30,6 +31,19 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave, onDel
   const [values, setValues] = useState<RecipeFormValues>({ title: '', ingredients: '', steps: '', is_public: true });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    //clean up on close
+    if (!open) {
+      setSaving(false);
+      setLoading(false);
+    }
+    // reset error on open
+    if (open) {
+      setError(null);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (initial?.recipe_id) {
@@ -39,6 +53,7 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave, onDel
         .then(full => setValues(full as RecipeFormValues))
         .catch(err => {
           console.error('Failed to load recipe', err);
+          // setError(err?.message || 'Failed to load recipe');
           setValues(initial);
         })
         .finally(() => setLoading(false));
@@ -58,25 +73,30 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave, onDel
 
   const handleSave = async () => {
     setSaving(true);
+    setError(null);
     try {
       await onSave(values);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Save failed', err);
-      // ideally show error to user
+      setError(err?.message || 'Failed to save recipe');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
+    const confirmed = window.confirm('Are you sure you want to delete this recipe?');
+    if (!confirmed) return;
+
     setSaving(true);
+    setError(null);
     try {
       await onDelete?.(values.recipe_id!);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Delete failed', err);
-      // ideally show error to user
+      setError(err.message || 'Failed to delete recipe');
     } finally {
       setSaving(false);
     }
@@ -86,6 +106,11 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave, onDel
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>{values.recipe_id ? 'Edit Recipe' : 'New Recipe'}</DialogTitle>
       <DialogContent>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
