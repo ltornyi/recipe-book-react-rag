@@ -1,6 +1,3 @@
-// Client helper for calling the API list endpoint: GET /api/recipes
-// Usage: import { fetchRecipes } from '../api/recipes';
-
 export interface RecipeSummary {
   recipe_id: number;
   title: string;
@@ -62,33 +59,51 @@ export async function fetchRecipes(opts: FetchRecipesOptions = {}): Promise<Reci
   return data;
 }
 
-// Example React usage (in a component):
-// import { useEffect, useState } from 'react';
-// import { fetchRecipes } from '../api/recipes';
-//
-// function Example() {
-//   const [data, setData] = useState<RecipesListResponse | null>(null);
-//   const [loading, setLoading] = useState(false);
-//
-//   useEffect(() => {
-//     setLoading(true);
-//     fetchRecipes({ page: 1, pageSize: 12, q: 'chicken', sortBy: 'title', sortDir: 'asc' })
-//       .then(d => setData(d))
-//       .catch(err => console.error(err))
-//       .finally(() => setLoading(false));
-//   }, []);
-//
-//   if (loading) return <div>Loading...</div>;
-//   return (
-//     <div>
-//       <div>Total: {data?.total}</div>
-//       <ul>
-//         {data?.items.map(r => (
-//           <li key={r.recipe_id}>{r.title} — {r.cuisine}</li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
+export interface CreateRecipeBody {
+  title: string;
+  description?: string | null;
+  ingredients: string;
+  steps: string;
+  cuisine?: string | null;
+  is_public?: boolean;
+}
 
-export default fetchRecipes;
+export async function createRecipe(body: CreateRecipeBody): Promise<{ recipe_id: number }>{
+  const res = await fetch(`/api/recipes`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Create recipe failed: ${res.status} ${res.statusText} ${text}`);
+  }
+  return res.json();
+}
+
+export async function getRecipe(id: number): Promise<RecipeSummary & { ingredients: string; steps: string; description?: string | null }> {
+  const res = await fetch(`/api/recipes/${id}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Accept': 'application/json' },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Get recipe failed: ${res.status} ${res.statusText} ${text}`);
+  }
+  return res.json();
+}
+
+export async function updateRecipe(id: number, body: Partial<CreateRecipeBody>): Promise<void> {
+  const res = await fetch(`/api/recipes/${id}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Update recipe failed: ${res.status} ${res.statusText} ${text}`);
+  }
+}

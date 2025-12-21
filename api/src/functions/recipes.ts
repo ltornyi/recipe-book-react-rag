@@ -35,7 +35,7 @@ export async function listRecipes(request: HttpRequest, context: InvocationConte
         if (vErr) return badRequest(vErr);
 
         const pool = await getSqlPool(context);
-        const result = await recipesRepo.getList(pool, { page, pageSize, sortBy, sortDir, search: q, filters }, user, context);
+        const result = await recipesRepo.getList(pool, { page, pageSize, sortBy, sortDir, search: q, filters }, user);
 
         return ok(result);
     } catch (err: any) {
@@ -67,7 +67,14 @@ export async function createRecipe(request: HttpRequest, context: InvocationCont
     try {
         const { user, error } = tryGetUser(request);
         if (error) return error;
-        const body = request.body;
+        
+        let body: any;
+        try {
+            body = await request.json();
+        } catch (parseErr) {
+            return badRequest({ error: "Invalid JSON body" });
+        }
+        
         const v = validateCreateRecipe(body);
         if (v) return badRequest(v);
 
@@ -87,7 +94,13 @@ export async function updateRecipe(request: HttpRequest, context: InvocationCont
         const id = parseInt(request.params.id, 10);
         if (isNaN(id)) return badRequest({ error: "Invalid id" });
 
-        const body = request.body;
+        let body: any;
+        try {
+            body = await request.json();
+        } catch (parseErr) {
+            return badRequest({ error: "Invalid JSON body" });
+        }
+
         const v = validateUpdateRecipe(body);
         if (v) return badRequest(v);
 

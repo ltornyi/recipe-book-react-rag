@@ -11,7 +11,7 @@ interface ListOptions {
     filters?: Record<string, any>;
 }
 
-export async function getList(pool: sql.ConnectionPool, opts: ListOptions, user: any, context: InvocationContext) {
+export async function getList(pool: sql.ConnectionPool, opts: ListOptions, user: any) {
     const page = Math.max(1, opts.page || 1);
     const pageSize = Math.min(100, opts.pageSize || 20);
     const offset = (page - 1) * pageSize;
@@ -67,7 +67,6 @@ export async function getList(pool: sql.ConnectionPool, opts: ListOptions, user:
         else request.input(p.name, sql.NVarChar(sql.MAX), p.value);
     }
 
-    context.log('Executing getList SQL:', sqlText, 'with params:', params);
     const result = await request.query(sqlText);
     const total = result.recordset.length ? result.recordset[0].total_count : 0;
     // strip total_count from items

@@ -23,7 +23,7 @@ export function validateListQuery(q: any): any | null {
     const page = parseInt(q.page as any, 10) || 1;
     const pageSize = parseInt(q.pageSize as any, 10) || 20;
     if (page < 1) return { error: "page must be >= 1" };
-    if (pageSize < 1 || pageSize > 100) return { error: "pageSize must be 1..100" };
+    if (pageSize < 1 || pageSize > 10000) return { error: "pageSize must be 1..10000" };
     if (q.sortBy && !ALLOWED_SORT_COLUMNS.has((q.sortBy as string).toLowerCase())) return { error: "invalid sortBy" };
     if (q.sortDir && !["asc","desc"].includes((q.sortDir as string).toLowerCase())) return { error: "invalid sortDir" };
     return null;
