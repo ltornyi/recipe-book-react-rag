@@ -103,7 +103,7 @@ export async function createRecipe(request: HttpRequest, context: InvocationCont
                 searchErr instanceof Error
                     ? searchErr.stack ?? searchErr.message
                     : String(searchErr);
-            return serverError(errorMessage);
+            return serverError(errorMessage + ', node version:' + process.version);
         }
 
         return created({ recipe_id: newId, message: "Created" });
