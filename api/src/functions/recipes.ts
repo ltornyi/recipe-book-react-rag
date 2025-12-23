@@ -4,6 +4,8 @@ import * as recipesRepo from "../shared/recipesRepo";
 import { validateCreateRecipe, validateUpdateRecipe, validateListQuery } from "../shared/validate";
 import { ok, created, noContent, badRequest, serverError } from "../shared/responseHelpers";
 import { tryGetUser } from "../shared/auth";
+import { generateEmbedding } from "../shared/openAI";
+import { deleteRecipeFromSearchIndex, SearchRecipe, storeRecipeInSearchIndex } from "../shared/search";
 
 /**
  * Recipes API handlers
@@ -63,6 +65,17 @@ export async function getRecipe(request: HttpRequest, context: InvocationContext
     }
 }
 
+async function buildSearchRecipe(recipeId: number, title: string, ingredients: string, steps: string): Promise<SearchRecipe> {
+    const embedding = await generateEmbedding(`${title}\n\n${ingredients}\n\n${steps}`);
+    return {
+        id: recipeId.toString(),
+        title,
+        ingredients,
+        steps,
+        embedding
+    };
+}
+
 export async function createRecipe(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     try {
         const { user, error } = tryGetUser(request);
@@ -80,6 +93,10 @@ export async function createRecipe(request: HttpRequest, context: InvocationCont
 
         const pool = await getSqlPool(context);
         const newId = await recipesRepo.createRecipe(pool, body, user);
+
+        const searchRecipe = await buildSearchRecipe(newId, body.title, body.ingredients, body.steps);
+        await storeRecipeInSearchIndex(searchRecipe);
+
         return created({ recipe_id: newId, message: "Created" });
     } catch (err: any) {
         context.error("Unhandled error in createRecipe", err);
@@ -107,6 +124,10 @@ export async function updateRecipe(request: HttpRequest, context: InvocationCont
         const pool = await getSqlPool(context);
         const updated = await recipesRepo.updateRecipe(pool, id, body, user);
         if (!updated) return { status: 404, jsonBody: { error: "Not found or not permitted" } };
+
+        const searchRecipe = await buildSearchRecipe(id, body.title, body.ingredients, body.steps);
+        await storeRecipeInSearchIndex(searchRecipe);
+
         return ok({ recipe_id: id, message: "Updated" });
     } catch (err: any) {
         context.error("Unhandled error in updateRecipe", err);
@@ -124,6 +145,9 @@ export async function deleteRecipe(request: HttpRequest, context: InvocationCont
         const pool = await getSqlPool(context);
         const deleted = await recipesRepo.deleteRecipe(pool, id, user);
         if (!deleted) return { status: 404, jsonBody: { error: "Not found or not permitted" } };
+
+        await deleteRecipeFromSearchIndex(id.toString());
+
         return noContent();
     } catch (err: any) {
         context.error("Unhandled error in deleteRecipe", err);

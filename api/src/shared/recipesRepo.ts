@@ -1,6 +1,5 @@
 import sql from "mssql";
 import { sanitizeSortColumn, sanitizeSortDir, buildFilterClauses } from "./sqlHelpers";
-import { InvocationContext } from "@azure/functions";
 
 interface ListOptions {
     page: number;

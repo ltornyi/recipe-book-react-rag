@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
+    "@azure/search-documents": "^12.2.0",
     "dotenv": "^17.2.3",
-    "mssql": "^12.2.0"
+    "mssql": "^12.2.0",
+    "openai": "^6.15.0"
   },
   "devDependencies": {
     "@types/node": "^20.x",
