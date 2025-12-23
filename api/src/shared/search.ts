@@ -35,7 +35,7 @@ export const deleteRecipeFromSearchIndex = async (id: string) => {
     await client.deleteDocuments("id", [id]);
 }
 
-const buildSearchOptions = (topK: number, queryEmbedding: number[]) => {
+const buildVectorSearchOptions = (topK: number, queryEmbedding: number[]) => {
     const options = {
         select: ["id", "title", "ingredients", "steps"],
         top: topK,
@@ -59,9 +59,9 @@ const buildSearchOptions = (topK: number, queryEmbedding: number[]) => {
     return options;
 };
 
-export const searchRecipes = async (topK: number, queryEmbedding: number[]) => {
+export const vectorSearchRecipes = async (topK: number, queryEmbedding: number[]) => {
     const client = getSearchClient();
-    const options = buildSearchOptions(topK, queryEmbedding);
+    const options = buildVectorSearchOptions(topK, queryEmbedding);
     const results = await client.search("*", options);
 
     const hits: SearchResult[] = [];
