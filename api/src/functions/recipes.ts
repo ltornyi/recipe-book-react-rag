@@ -94,8 +94,17 @@ export async function createRecipe(request: HttpRequest, context: InvocationCont
         const pool = await getSqlPool(context);
         const newId = await recipesRepo.createRecipe(pool, body, user);
 
-        const searchRecipe = await buildSearchRecipe(newId, body.title, body.ingredients, body.steps);
-        await storeRecipeInSearchIndex(searchRecipe);
+        try {
+            const searchRecipe = await buildSearchRecipe(newId, body.title, body.ingredients, body.steps);
+            await storeRecipeInSearchIndex(searchRecipe);
+        } catch (searchErr) {
+            context.error("Failed to store recipe in search index", searchErr);
+            const errorMessage =
+                searchErr instanceof Error
+                    ? searchErr.stack ?? searchErr.message
+                    : String(searchErr);
+            return serverError(errorMessage);
+        }
 
         return created({ recipe_id: newId, message: "Created" });
     } catch (err: any) {
