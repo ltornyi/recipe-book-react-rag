@@ -7,3 +7,4 @@ export function badRequest(body: any): HttpResponseInit { return { status: 400, 
 export function unauthorized(message: any): HttpResponseInit { return { status: 401, jsonBody: { error: message } }; }
 export function forbidden(message: any): HttpResponseInit { return { status: 403, jsonBody: { error: message } }; }
 export function serverError(message?: any): HttpResponseInit { return { status: 500, jsonBody: { error: message || "Internal server error" } }; }
+export function notImplemented(message?: any): HttpResponseInit { return { status: 501, jsonBody: { error: message || "Not implemented" } }; }

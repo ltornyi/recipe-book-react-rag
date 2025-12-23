@@ -66,7 +66,7 @@ export const vectorSearchRecipes = async (topK: number, queryEmbedding: number[]
 
     const hits: SearchResult[] = [];
     for await (const result of results.results) {
-        hits.push(result.document as SearchResult);
+        hits.push({...result.document, score: result.score} as SearchResult);
     }
     return hits;
 };

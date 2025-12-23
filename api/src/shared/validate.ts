@@ -28,3 +28,11 @@ export function validateListQuery(q: any): any | null {
     if (q.sortDir && !["asc","desc"].includes((q.sortDir as string).toLowerCase())) return { error: "invalid sortDir" };
     return null;
 }
+
+export function validateRecipeSearch(body: any): any | null {
+    if (!body) return { error: "Missing body" };
+    if (!body.query || typeof body.query !== "string" || body.query.trim().length === 0) return { error: "query is required" };
+    if (body.mode && !["vector", "keyword", "hybrid"].includes(body.mode)) return { error: "invalid mode" };
+    if (body.topK && (typeof body.topK !== "number" || body.topK < 1)) return { error: "topK must be a positive number" };
+    return null;
+}
