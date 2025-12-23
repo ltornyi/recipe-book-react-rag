@@ -54,7 +54,6 @@ export async function getRecipe(request: HttpRequest, context: InvocationContext
         const id = parseInt(request.params.id, 10);
         if (isNaN(id)) return badRequest({ error: "Invalid id" });
 
-
         const pool = await getSqlPool(context);
         const row = await recipesRepo.getById(pool, id, user);
         if (!row) return { status: 404, jsonBody: { error: "Not found" } };
@@ -99,11 +98,12 @@ export async function createRecipe(request: HttpRequest, context: InvocationCont
             await storeRecipeInSearchIndex(searchRecipe);
         } catch (searchErr) {
             context.error("Failed to store recipe in search index", searchErr);
-            const errorMessage =
-                searchErr instanceof Error
-                    ? searchErr.stack ?? searchErr.message
-                    : String(searchErr);
-            return serverError(errorMessage + ', node version:' + process.version);
+            // const errorMessage =
+            //     searchErr instanceof Error
+            //         ? searchErr.stack ?? searchErr.message
+            //         : String(searchErr);
+            // return serverError(errorMessage + ', node version:' + process.version);
+            return serverError("Failed to store recipe in search index: " + (searchErr as Error).message);
         }
 
         return created({ recipe_id: newId, message: "Created" });
@@ -134,8 +134,13 @@ export async function updateRecipe(request: HttpRequest, context: InvocationCont
         const updated = await recipesRepo.updateRecipe(pool, id, body, user);
         if (!updated) return { status: 404, jsonBody: { error: "Not found or not permitted" } };
 
-        const searchRecipe = await buildSearchRecipe(id, body.title, body.ingredients, body.steps);
-        await storeRecipeInSearchIndex(searchRecipe);
+        try {
+            const searchRecipe = await buildSearchRecipe(id, body.title, body.ingredients, body.steps);
+            await storeRecipeInSearchIndex(searchRecipe);
+        } catch (searchErr) {
+            context.error("Failed to update recipe in search index", searchErr);
+            return serverError("Failed to update recipe in search index: " + (searchErr as Error).message);
+        }
 
         return ok({ recipe_id: id, message: "Updated" });
     } catch (err: any) {
@@ -155,7 +160,12 @@ export async function deleteRecipe(request: HttpRequest, context: InvocationCont
         const deleted = await recipesRepo.deleteRecipe(pool, id, user);
         if (!deleted) return { status: 404, jsonBody: { error: "Not found or not permitted" } };
 
-        await deleteRecipeFromSearchIndex(id.toString());
+        try {
+            await deleteRecipeFromSearchIndex(id.toString());
+        } catch (searchErr) {
+            context.error("Failed to remove recipe from search index", searchErr);
+            return serverError("Failed to remove recipe from search index: " + (searchErr as Error).message);
+        }
 
         return noContent();
     } catch (err: any) {
