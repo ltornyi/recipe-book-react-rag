@@ -1,0 +1,37 @@
+{
+  "name": "recipes-index",
+   "fields": [
+     {"name": "id", "type": "Edm.String", "retrievable": true, "key": true},
+     {"name": "title", "type": "Edm.String", "searchable": true, "retrievable": true},
+     {"name": "ingredients", "type": "Edm.String", "searchable": true, "retrievable": true},
+     {"name": "steps", "type": "Edm.String", "searchable": true, "retrievable": true},
+     {
+        "name": "embedding",
+        "type": "Collection(Edm.Single)",
+        "searchable": true,
+        "retrievable": true,
+        "dimensions": 1536,
+        "vectorSearchProfile": "myHnswProfile"
+    }
+  ],
+  "vectorSearch": {
+    "algorithms": [ { "name": "myHnswAlgorithm", "kind": "hnsw"} ],
+    "profiles": [
+      {
+        "name": "myHnswProfile",
+        "algorithm": "myHnswAlgorithm",
+        "compression": "myVectorCompression"
+      }
+    ],
+    "compressions": [
+      {
+        "name": "myVectorCompression",
+        "kind": "binaryQuantization",
+        "rescoringOptions": {
+          "enableRescoring": false,
+          "rescoreStorageMethod": "preserveOriginals"
+        }
+      }
+    ]
+  }
+}
