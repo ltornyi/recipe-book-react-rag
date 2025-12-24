@@ -114,7 +114,7 @@ export default function SemanticSearchPage() {
         </Alert>
       )}
 
-      <Paper style={{ height: 600 }}>
+      <Paper style={{ height: 650 }}>
         <DataGrid
           rows={results}
           columns={columns}

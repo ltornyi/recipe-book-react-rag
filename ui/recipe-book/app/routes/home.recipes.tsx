@@ -136,7 +136,7 @@ export default function RecipesPage() {
           sortingMode="client"
           onRowDoubleClick={handleRowDoubleClick}
           initialState={{
-            pagination: { paginationModel: { pageSize: 5 } }
+            pagination: { paginationModel: { pageSize: 10 } }
           }}
           pageSizeOptions={[5,10,20,50]}
           disableColumnSelector
