@@ -41,7 +41,7 @@ export default function RecipesPage() {
         pageSize: 10000,
         q: search || undefined
       });
-      setAllRecipes(res.items);
+      setAllRecipes(res);
     } catch (err: any) {
       console.error('Failed to load recipes', err);
       setError(err.message || 'Failed to load recipes');

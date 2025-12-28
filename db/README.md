@@ -1,63 +1,59 @@
 ## Create database user and grant permissions
 
-### Create login and DB user
+### Create Oracle DBuser to own objects
 
-This requires Azure Data Studio.
+    create user recipe_book identified by "<password>" default tablespace data quota unlimited on data;
+    GRANT resource, connect TO recipe_book;
 
-    USE master;
-    CREATE LOGIN <api-user> WITH PASSWORD = '<password>';
+### Enable ORDS for recipe_book
 
-    USE <your database>
-    CREATE USER <api-user> FOR LOGIN <api-user>;
+run `ords\01schema.sql` as ADMIN
 
-## Create schema
+### Create objects
 
-    CREATE SCHEMA recipe_book;
-
-### Grant permissions
-
-    GRANT SELECT, INSERT, UPDATE, DELETE
-    ON SCHEMA::recipe_book
-    TO <api-user>;
-
-### Check user setup
-
-    SELECT
-        name,
-        type_desc,
-        authentication_type_desc
-    FROM sys.database_principals
-    WHERE name = '<api-user>';
-
-    SELECT
-        dp.name       AS principal_name,
-        dp.type_desc AS principal_type,
-        perm.permission_name,
-        perm.state_desc,
-        s.name        AS schema_name
-    FROM sys.database_permissions perm
-    JOIN sys.database_principals dp
-        ON perm.grantee_principal_id = dp.principal_id
-    JOIN sys.schemas s
-        ON perm.major_id = s.schema_id
-    WHERE dp.name = '<api-user>'
-    AND perm.class_desc = 'SCHEMA';
-
-    EXECUTE AS USER = '<api-user>';
-    SELECT
-        permission_name
-    FROM fn_my_permissions(NULL, 'DATABASE');
-    REVERT;
-
-    EXECUTE AS USER = '<api-user>';
-    SELECT permission_name
-    FROM fn_my_permissions('recipe_book', 'SCHEMA');
-    REVERT;
-
-## Create objects
-
-Run the scripts in the `tables` folder:
+Run the scripts in the `tables` folder as RECIPE_BOOK:
 
     users.sql
     recipes.sql
     user_favourite_recipes.sql
+
+## Set up APIs
+
+### Configure ORDS
+
+Log into the Database actions portal as RECIPE_BOOK and continue ORDS setup. Run the following scripts:
+
+    02module.sql
+    03recipe_template_handlers.sql
+    04recipe_id_template_handlers.sql
+
+### Test using curl
+
+    curl -X GET "https://<your-adb-hostname>/ords/recipe_book/api/recipes?q=%25&userid=7"
+
+See more examples in the scripts.
+
+## Secure endpoints
+
+Run the following script as RECIPE_BOOK:
+
+    05role_privilege.sql
+
+Try the curl commands; now all should return 401 Unauthorized
+
+## Set up client
+
+Run the script `ords\06oauth.sql` as RECIPE_BOOK. Verify the client setup:
+
+    select client_id,client_secret from user_ords_clients where name = 'S2S Recipe Client';
+    select * from user_ords_client_roles where client_name = 'S2S Recipe Client';
+
+Try getting an access token:
+
+    curl -i --user clientId:clientSecret --data "grant_type=client_credentials" https://<your-adb-hostname>/ords/recipe_book/oauth/token
+
+The response should be HTTP 200 and the response JSON will contain the access token.
+
+Try accessing a protected endpoint again; this time it should succeed:
+
+    curl -i -H "Authorization: Bearer accessToken" https://<your-adb-hostname>/ords/recipe_book/api/recipes/
