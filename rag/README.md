@@ -46,7 +46,7 @@ Change model names in `checkOpenAI.mjs` if needed; try running it.
 
 ### Check Azure AI search connectivity and functionality.
 
-Review `checkSearch.mjs`; try running it. 
+Review `checkSearch.mjs`; try running it. Review `deleteBuId.mjs` and `keywordSearch.mjs` for example usecases.
 
 ## Design and functionality
 
