@@ -1,6 +1,4 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
-import { getSqlPool } from "../shared/sqlPool";
-import * as recipesRepo from "../shared/recipesRepo";
 import { validateCreateRecipe, validateUpdateRecipe } from "../shared/validate";
 import { ok, created, noContent, badRequest, serverError } from "../shared/responseHelpers";
 import { tryGetUser } from "../shared/auth";

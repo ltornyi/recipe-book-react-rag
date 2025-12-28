@@ -4,28 +4,9 @@
 
 `Azure Static Web Apps: Create HTTP Function....`
 
-## Set up EntraID identity for the API
+## Create ORDS endpoints
 
-This involves creating an application registration, a client secret and creating an externally identified user in the database. Ultimately it didn't work - for some reason, the connection was immediately dropped.
-
-## Set up SQL authentication for the API
-
-### Create database user and grant permissions
-
-See under `db`. The Azure SQL Server hostname and the database name go into the environment variables named `AZURE_SQL_SERVER` and `AZURE_SQL_DATABASE`. The database username and password go into the environment variables `AZURE_SQL_USER` and `AZURE_SQL_PASSWORD`.
-
-### Test database connectivity
-
-Create a .env file with the following values:
-
-    AZURE_SQL_SERVER=myserver.database.windows.net
-    AZURE_SQL_DATABASE=RecipeDB
-    AZURE_SQL_USER=username
-    AZURE_SQL_PASSWORD=password
-
-Run
-
-    node ./test_db_connection.js
+See under `db`. The Oracle Autonomous DB hostname and base path goes into the environment variable named `ORACLE_ORDS_BASE_URL`. The generated client id and client secret go into the environment variables `ORACLE_ORDS_CLIENT_ID` and `ORACLE_ORDS_CLIENT_SECRET`.
 
 ## Local development
 
@@ -33,11 +14,10 @@ Add environment variables to local.settings.json, example:
 
     {
         "Values": {
-            "AZURE_SQL_SERVER": "myserver.database.windows.net",
-            "AZURE_SQL_DATABASE": "RecipeDB",
-            "AZURE_SQL_USER": "username",
-            "AZURE_SQL_PASSWORD": "password",
-            "ALLOWED_EMAIL_DOMAIN": "@mycompanydomain.com"
+            "ALLOWED_EMAIL_DOMAIN": "@mycompanydomain.com",
+            "ORACLE_ORDS_BASE_URL": "https://your.ads.host/ords/recipe_book/",
+            "ORACLE_ORDS_CLIENT_ID": "your.ords.client.id",
+            "ORACLE_ORDS_CLIENT_SECRET": "your.ords.client.secret"
         }
     }
 
@@ -52,7 +32,7 @@ SWA emulator, see details under `ui`. Function endpints will be available under 
 ## Deploy to Azure
 
 Deployment is automatic with Github actions when changes are pushed or merged into the main branch. After the initial deployment,
-set up the five environment variables for the static app in Azure portal under Settings -> Environment variables.
+set up the environment variables for the static app in Azure portal under Settings -> Environment variables.
 
 ## Documentation: Recipe APIs
 
@@ -72,19 +52,14 @@ These are HTTP endpoints added under the Azure Functions app in `api/src/functio
   - Method: `GET`
   - Route: `/api/recipes`
   - Query params:
-    - `page` (int, default 1)
-    - `pageSize` (int, default 20, max 100)
-    - `sortBy` (string) — allowed: `recipe_id`, `title`, `cuisine`, `created_at`, `updated_at`, `is_public`, `created_by_user_email`
-    - `sortDir` (`asc`|`desc`, default `asc`)
     - `q` (string) — cross-column text search across `title`, `description`, `ingredients`, `steps`, `cuisine`
-    - `filter_<column>=<value>` — simple equality filters for allowed columns (e.g. `filter_cuisine=Italian`, `filter_is_public=1`).
-  - Response: `{ total, page, pageSize, items: [ { recipe_id, title, description, cuisine, created_by_user_email, created_by_user_id, is_public, created_at, updated_at } ] }`
+  - Response: `{ [ { recipe_id, title, description, cuisine, created_by_user_email, created_by_user_id, is_public, created_at, updated_at } ] }`
   - Notes: private recipes (`is_public = 0`) require ownership.
 
 - **Get single recipe**
   - Method: `GET`
   - Route: `/api/recipes/{id}`
-  - Response: full recipe row including `ingredients` and `steps` (NVARCHAR(MAX) fields)
+  - Response: full recipe row including `ingredients` and `steps` (NCLOB fields)
   - Notes: private recipes (`is_public = 0`) require ownership.
 
 - **Create recipe**
