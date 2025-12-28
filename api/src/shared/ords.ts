@@ -1,3 +1,4 @@
+import { InvocationContext } from "@azure/functions";
 import { AuthenticatedUser } from "./auth";
 
 export interface OrdsRecipe {
@@ -12,7 +13,14 @@ export interface OrdsRecipe {
     updated_at: string;
 }
 
-export const getAccessToken = async (): Promise<string> => {
+const EXPIRY_BUFFER_MS = 300000; // 5 minute buffer
+let accessTokenCache: { token: string; expiresAt: number } | null = null;
+
+export const getAccessToken = async (context: InvocationContext): Promise<string> => {
+    if (accessTokenCache && accessTokenCache.expiresAt > Date.now() + EXPIRY_BUFFER_MS) {
+        context.log("Using cached ORDS access token, expires at ", new Date(accessTokenCache.expiresAt).toISOString());
+        return accessTokenCache.token;
+    }
     const tokenUrl = `${process.env.ORACLE_ORDS_BASE_URL}oauth/token`;
     const clientId = process.env.ORACLE_ORDS_CLIENT_ID;
     const clientSecret = process.env.ORACLE_ORDS_CLIENT_SECRET;
@@ -34,6 +42,10 @@ export const getAccessToken = async (): Promise<string> => {
     }
 
     const data = await response.json();
+    accessTokenCache = {
+        token: data.access_token,
+        expiresAt: Date.now() + (data.expires_in * 1000)
+    };
     return data.access_token;
 };
 
@@ -128,7 +140,7 @@ export const updateRecipe = async (accessToken: string, id: number, body: any, u
 
 export const deleteRecipe = async (accessToken: string, id: number, user: AuthenticatedUser): Promise<boolean> => {
     // ensure owner: part of the deleteRecipe API
-    
+
     const url = new URL(`${process.env.ORACLE_ORDS_BASE_URL}api/recipes/${id}`);
     url.searchParams.append('userid', user.userId);
     //add access token in Authorization header as Bearer token

@@ -17,7 +17,7 @@ export async function listRecipes(request: HttpRequest, context: InvocationConte
 
         const q = request.query.get("q") || undefined;
 
-        const accessToken = await ords.getAccessToken();
+        const accessToken = await ords.getAccessToken(context);
         const result = await ords.getRecipeList(accessToken, q, user);
         return ok(result);
     } catch (err: any) {
@@ -34,7 +34,7 @@ export async function getRecipe(request: HttpRequest, context: InvocationContext
         const id = parseInt(request.params.id, 10);
         if (isNaN(id)) return badRequest({ error: "Invalid id" });
 
-        const accessToken = await ords.getAccessToken();
+        const accessToken = await ords.getAccessToken(context);
         const row = await ords.getRecipeById(accessToken, id, user);
         if (!row) return { status: 404, jsonBody: { error: "Not found" } };
         return ok(row);
@@ -70,7 +70,7 @@ export async function createRecipe(request: HttpRequest, context: InvocationCont
         const v = validateCreateRecipe(body);
         if (v) return badRequest(v);
 
-        const accessToken = await ords.getAccessToken();
+        const accessToken = await ords.getAccessToken(context);
         const newId = await ords.createRecipe(accessToken, body, user);
 
         try {
@@ -110,7 +110,7 @@ export async function updateRecipe(request: HttpRequest, context: InvocationCont
         const v = validateUpdateRecipe(body);
         if (v) return badRequest(v);
 
-        const accessToken = await ords.getAccessToken();
+        const accessToken = await ords.getAccessToken(context);
         const updated = await ords.updateRecipe(accessToken, id, body, user);
         if (!updated) return { status: 404, jsonBody: { error: "Not found or not permitted" } };
 
@@ -136,7 +136,7 @@ export async function deleteRecipe(request: HttpRequest, context: InvocationCont
         const id = parseInt(request.params.id, 10);
         if (isNaN(id)) return badRequest({ error: "Invalid id" });
 
-        const accessToken = await ords.getAccessToken();
+        const accessToken = await ords.getAccessToken(context);
         const deleted = await ords.deleteRecipe(accessToken, id, user);
         if (!deleted) return { status: 404, jsonBody: { error: "Not found or not permitted" } };
 
