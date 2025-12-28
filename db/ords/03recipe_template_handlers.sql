@@ -41,6 +41,7 @@ BEGIN
                         OR LOWER(r.cuisine)     LIKE LOWER(:qry)
                     )
                 )
+            ORDER BY r.created_at DESC, r.recipe_id DESC
         ]'
     );   
 END;

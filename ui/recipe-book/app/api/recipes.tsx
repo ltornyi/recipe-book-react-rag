@@ -5,17 +5,17 @@ export interface RecipeSummary {
   cuisine?: string | null;
   created_by_user_id?: string | null;
   created_by_user_email?: string | null;
-  is_public: boolean;
+  is_public: number;
   created_at: string;
   updated_at: string;
 }
 
-export interface RecipesListResponse {
-  total: number;
-  page: number;
-  pageSize: number;
-  items: RecipeSummary[];
-}
+// export interface RecipesListResponse {
+//   total: number;
+//   page: number;
+//   pageSize: number;
+//   items: RecipeSummary[];
+// }
 
 export interface FetchRecipesOptions {
   page?: number;
@@ -42,7 +42,7 @@ function buildQuery(opts: FetchRecipesOptions): string {
   return qs ? `?${qs}` : '';
 }
 
-export async function fetchRecipes(opts: FetchRecipesOptions = {}): Promise<RecipesListResponse> {
+export async function fetchRecipes(opts: FetchRecipesOptions = {}): Promise<RecipeSummary[]> {
   const qs = buildQuery(opts);
   const res = await fetch(`/api/recipes${qs}`, {
     method: 'GET',
@@ -55,7 +55,7 @@ export async function fetchRecipes(opts: FetchRecipesOptions = {}): Promise<Reci
     throw new Error(`Failed to fetch recipes: ${res.status} ${res.statusText} ${text}`);
   }
 
-  const data = (await res.json()) as RecipesListResponse;
+  const data = (await res.json()) as RecipeSummary[];
   return data;
 }
 
