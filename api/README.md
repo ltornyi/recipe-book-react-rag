@@ -8,12 +8,21 @@
 
 See under `db`. The Oracle Autonomous DB hostname and base path goes into the environment variable named `ORACLE_ORDS_BASE_URL`. The generated client id and client secret go into the environment variables `ORACLE_ORDS_CLIENT_ID` and `ORACLE_ORDS_CLIENT_SECRET`.
 
+## Set up Azure OpeanAI and Azure AI search
+
+See details under `rag`. The relevant endpoints and keys should go into environment variables, see example below.
+
 ## Local development
 
 Add environment variables to local.settings.json, example:
 
     {
         "Values": {
+            "OPENAI_BASE_URL": "https://your-foundry-resource.openai.azure.com/openai/v1/",
+            "OPENAI_API_KEY": "yourKey",
+            "AZURE_SEARCH_SERVICE_ENDPOINT": "https://your-search-resource.search.windows.net",
+            "AZURE_SEARCH_ADMIN_KEY": "yourKey",
+            "AZURE_SEARCH_INDEX_NAME": "name-of-index",
             "ALLOWED_EMAIL_DOMAIN": "@mycompanydomain.com",
             "ORACLE_ORDS_BASE_URL": "https://your.ads.host/ords/recipe_book/",
             "ORACLE_ORDS_CLIENT_ID": "your.ords.client.id",
