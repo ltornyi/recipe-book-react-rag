@@ -37,7 +37,7 @@ See more examples in the scripts.
 
 Run the following script as RECIPE_BOOK:
 
-    05reole_privilege.sql
+    05role_privilege.sql
 
 Try the curl commands; now all should return 401 Unauthorized
 
