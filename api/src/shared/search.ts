@@ -80,11 +80,20 @@ export const vectorSearchRecipes = async (topK: number, queryEmbedding: number[]
 
 export const keywordSearchRecipes = async (topK: number, query: string) => {
     const options = {
-        searchMode: "all",
-        includeTotalCount: true,
         select: ["id", "title", "ingredients", "steps"],
         top: topK,
+        searchMode: "all",
+        includeTotalCount: true,
     };
+
+    const hits = await executeSearch(query, options);
+    return hits
+};
+
+export const hybridSearchRecipes = async (topK: number, query: string, queryEmbedding: number[]) => {
+    const options = buildVectorSearchOptions(topK, queryEmbedding);
+    options["searchMode"] = "all";
+    options["includeTotalCount"] = true;
 
     const hits = await executeSearch(query, options);
     return hits
