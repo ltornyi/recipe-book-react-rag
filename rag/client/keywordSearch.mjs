@@ -31,6 +31,7 @@ const promptUser = () => {
 };
 
 const searchOptions = {
+  searchMode: "all",
   includeTotalCount: true,
   select: ["id", "title", "ingredients", "steps"],
   top: 5
