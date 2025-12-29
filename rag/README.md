@@ -65,7 +65,7 @@ Review `checkSearch.mjs`; try running it. Review `deleteBuId.mjs` and `keywordSe
 
         searchClient.deleteDocuments(keyName, [keyValue])
 
-### vector search
+### Vector search
 
 * take query string from user
 * generate embedding for query string
@@ -92,5 +92,36 @@ Review `checkSearch.mjs`; try running it. Review `deleteBuId.mjs` and `keywordSe
         }
         searchClient.search("*",options)
 
+### Keyword search
+
+Also called full text search. Simple query synxtax is used, +,-,| operators stand for AND, NOT, OR.
+Prefix query can also be used (i.e. pepp* means words starting with pepp). Parenthesis are used to create subqueries.
+"chichen+(avocado|bacon)" translates to "chicken AND (avocado OR bacon)".
+
+* take query string from user
+* execute full text search - by default searches all searchable fields of the index
+
+        options = {
+            select: ["id", "title", "ingredients"],
+            top: 5,
+            searchMode: "all",
+            includeTotalCount: true,
+        }
+        searchClient.search(userQuery,options)
+
+### Hybrid search
+
+Combines full text search with vector search. Behind the scenes, Azure AI Search runs both queries in parallel and merges the results.
+
+### Display search results
+
 * display records with score in grid
-* doubleclick queries Azure SQL Database and displays details in dialog
+* doubleclick queries Oracle Database via ORDS and displays details in dialog
+
+### References
+
+[Vector search](https://learn.microsoft.com/en-us/azure/search/vector-search-overview)
+
+[Full text search](https://learn.microsoft.com/en-us/azure/search/search-lucene-query-architecture)
+
+[Hybrid search](https://learn.microsoft.com/en-us/azure/search/hybrid-search-overview)
