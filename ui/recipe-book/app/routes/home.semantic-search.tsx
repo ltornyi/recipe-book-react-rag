@@ -9,6 +9,7 @@ import {
   Button,
   MenuItem,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
@@ -100,7 +101,9 @@ export default function SemanticSearchPage() {
           sx={{ width: 120 }}
         >
           <MenuItem value="vector">Vector</MenuItem>
-          <MenuItem value="keyword">Keyword</MenuItem>
+          <MenuItem value="keyword">
+            <Tooltip title="+ = AND, | = OR, - = NOT, * = Prefix query, () = Grouping" placement="right"><div>Keyword</div></Tooltip>
+          </MenuItem>
           <MenuItem value="hybrid">Hybrid</MenuItem>
         </TextField>
         <Button variant="contained" onClick={handleSearch} disabled={loading}>

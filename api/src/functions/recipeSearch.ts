@@ -2,7 +2,7 @@ import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/fu
 import { badRequest, notImplemented, ok, serverError } from "../shared/responseHelpers.js";
 import { tryGetUser } from "../shared/auth.js";
 import { validateRecipeSearch } from "../shared/validate.js";
-import { SearchResult, vectorSearchRecipes } from "../shared/search.js";
+import { keywordSearchRecipes, SearchResult, vectorSearchRecipes } from "../shared/search.js";
 import { generateEmbedding } from "../shared/openAI.js";
 
 export type RecipeSearchRequestBody = {
@@ -18,7 +18,8 @@ async function executeSearch(searchReq: RecipeSearchRequestBody): Promise<HttpRe
             result = await vectorSearchRecipes(searchReq.topK, await generateEmbedding(searchReq.query));
             break;
         case "keyword":
-            return notImplemented("Keyword search not implemented yet");
+            result = await keywordSearchRecipes(searchReq.topK, searchReq.query);
+            break;
         case "hybrid":
             return notImplemented("Hybrid search not implemented yet");
         default:

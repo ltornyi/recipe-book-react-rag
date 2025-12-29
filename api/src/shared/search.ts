@@ -1,7 +1,5 @@
 import { AzureKeyCredential, SearchClient } from "@azure/search-documents";
 
-let searchClient = null;
-
 export type SearchRecipe = {
     id: string;
     title: string;
@@ -9,6 +7,8 @@ export type SearchRecipe = {
     steps: string;
     embedding: number[];
 };
+
+let searchClient: SearchClient<SearchRecipe> = null;
 
 export type SearchResult = SearchRecipe & {
     score: number;
@@ -59,14 +59,33 @@ const buildVectorSearchOptions = (topK: number, queryEmbedding: number[]) => {
     return options;
 };
 
-export const vectorSearchRecipes = async (topK: number, queryEmbedding: number[]) => {
+const executeSearch = async (query: string, options: any) => {
     const client = getSearchClient();
-    const options = buildVectorSearchOptions(topK, queryEmbedding);
-    const results = await client.search("*", options);
+    
+    const results = await client.search(query, options);
 
     const hits: SearchResult[] = [];
     for await (const result of results.results) {
         hits.push({...result.document, score: result.score} as SearchResult);
     }
     return hits;
+};
+
+export const vectorSearchRecipes = async (topK: number, queryEmbedding: number[]) => {
+    const options = buildVectorSearchOptions(topK, queryEmbedding);
+
+    const hits = await executeSearch("*", options);
+    return hits
+};
+
+export const keywordSearchRecipes = async (topK: number, query: string) => {
+    const options = {
+        searchMode: "all",
+        includeTotalCount: true,
+        select: ["id", "title", "ingredients", "steps"],
+        top: topK,
+    };
+
+    const hits = await executeSearch(query, options);
+    return hits
 };
