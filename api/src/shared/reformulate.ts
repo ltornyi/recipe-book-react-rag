@@ -12,7 +12,7 @@ export const transformBodyToReformulateQuestionRequest = (body: any): Reformulat
     };
 };
 
-export const ExecuteReformulateQuestion = async (conversation: Conversation, userMessage: string): Promise<string> => {
+export const executeReformulateQuestion = async (conversation: Conversation, userMessage: string): Promise<string> => {
     const systemPrompt = `You are a query rewriting assistant.
 
     Your task:

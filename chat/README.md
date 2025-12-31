@@ -135,6 +135,8 @@ on the UI and links/buttons are displayed to bring up details of recipes used.
 
 When running locally via SWA, execute the following in the browser's dev console:
 
+for reformulate
+
     (async () => {
         const response = await fetch("http://localhost:4280/api/chat/reformulate", {
             method: "POST",
@@ -149,6 +151,32 @@ When running locally via SWA, execute the following in the browser's dev console
                 { role: "assistant", content: "Any ingredients you particularly like or want to avoid?" }
             ],
             userMessage: "What about ones with mushrooms?"
+            }),
+        });
+
+        const data = await response.json();
+
+        console.log("HTTP status:", response.status);
+        console.log("Response:", data);
+    })();
+
+for chat
+
+    (async () => {
+        const response = await fetch("http://localhost:4280/api/chat", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            conversation: [
+                { role: "user", content: "I’m looking for dinner ideas." },
+                { role: "assistant", content: "What kind of cuisine are you interested in?" },
+                { role: "user", content: "Vegetarian." },
+                { role: "assistant", content: "Any ingredients you particularly like or want to avoid?" },
+            ],
+            // reformulated, standalone question produced by /api/chat/reformulate
+            userMessage: "What vegetarian recipes with mushrooms are available?"
             }),
         });
 

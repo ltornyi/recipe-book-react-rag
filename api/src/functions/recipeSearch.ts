@@ -1,5 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
-import { badRequest, notImplemented, ok, serverError } from "../shared/responseHelpers.js";
+import { badRequest, ok, serverError } from "../shared/responseHelpers.js";
 import { tryGetUser } from "../shared/auth.js";
 import { validateRecipeSearch } from "../shared/validate.js";
 import { hybridSearchRecipes, keywordSearchRecipes, SearchResult, vectorSearchRecipes } from "../shared/search.js";
