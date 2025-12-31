@@ -23,3 +23,10 @@ export function validateRecipeSearch(body: any): any | null {
     if (body.topK && (typeof body.topK !== "number" || body.topK < 1)) return { error: "topK must be a positive number" };
     return null;
 }
+
+export function validateReformulateQuestion(body: any): any | null {
+    if (!body) return { error: "Missing body" };
+    if (!body.conversation || !Array.isArray(body.conversation)) return { error: "conversation is required" };
+    if (!body.userMessage || typeof body.userMessage !== "string" || body.userMessage.trim().length === 0) return { error: "userMessage is required" };
+    return null;
+}
