@@ -24,9 +24,9 @@ is generated based on the search results and so on. Imagine the following conver
 * User: "I want something vegeterian"
     * ...steps 2,3,4,5,6,7 are executed behind the scenes
 * LLM: "I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"
-* User: "From those, which is the quiest to cook?"
+* User: "From those, which is the quickest to cook?"
 
-At this point if we continue executing the steps, we will run a vector query based on the question "From those, which is the quiest to cook?", this will produce results which could easily be different from the first search result and the next prompt will be built with this second result set as context.
+At this point if we continue executing the steps, we will run a vector query based on the question "From those, which is the quickest to cook?", this will produce results which could easily be different from the first search result and the next prompt will be built with this second result set as context.
 
 ## Idea
 
@@ -47,7 +47,7 @@ If all goes well, the previous conversation will look something like this
 * User: "I want something vegeterian"
     * ...step 2 produces the same query, steps 3,4,5,6,7,8 are executed as before
 * LLM: "I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"
-* User: "From those, which is the quiest to cook?"
+* User: "From those, which is the quickest to cook?"
 
 At this point, step 2 produces a question like "Considering the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach, which is the quickest to cook?"
 and the search and conversation can continue with context preserved.
@@ -57,12 +57,23 @@ and the search and conversation can continue with context preserved.
 ### Client side
 
 The client will keep the chat history and it will be the client's responsiblity to reformulate the user's query.
-It will keep an array of messages in local state; for user queries, it will only have the reformulated query:
+It will keep an array of messages in local state; for API purposes, it will have the reformulated query and for UI purposes
+it will have the original user prompt.
+
+for the API:
 
     [
         {role:"user", message:"I want something vegeterian"},
         {role:"assistant", message:"I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"},
         {role:"user", message:"Considering the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach, which is the quickest to cook?"}
+    ]
+
+for the UI:
+
+    [
+        {role:"user", message:"I want something vegeterian"},
+        {role:"assistant", message:"I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"},
+        {role:"user", message:"From those, which is the quickest to cook?"}
     ]
 
 ### APIs
@@ -72,10 +83,10 @@ It will keep an array of messages in local state; for user queries, it will only
 The API expects the user's latest query and the chat history. Payload example:
 
     {
-        "query":"From those, which is the quiest to cook?"
-        "history": [
-            {role:"user", message:"I want something vegeterian"},
-            {role:"assistant", message:"I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"}
+        "userMessage":"From those, which is the quickest to cook?"
+        "conversation": [
+            {role:"user", content:"I want something vegeterian"},
+            {role:"assistant", content:"I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"}
         ]
     }
 
@@ -103,10 +114,10 @@ The API response contains the LLM's output which is the reformulated question.
 The API expects the user's reformulated query and the chat history. Payload example:
 
     {
-        "query":"Considering the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach, which is the quickest to cook?"
-        "history": [
-            {role:"user", message:"I want something vegeterian"},
-            {role:"assistant", message:"I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"}
+        "userMessage":"Considering the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach, which is the quickest to cook?"
+        "conversation": [
+            {role:"user", content:"I want something vegeterian"},
+            {role:"assistant", content:"I can recommend the Mushroom Soup, the Chickpea Risotto and the Creamy Spinach"}
         ]
     }
 

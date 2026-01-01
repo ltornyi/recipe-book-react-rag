@@ -24,4 +24,4 @@ Azure AI Search is used to provide vector search (semantic search) capabilities.
 
 ## AI chat
 
-more to come...
+RAG-enabled AI chat, uses recipe semantic search to create context for the LLM. See `chat` for details.
