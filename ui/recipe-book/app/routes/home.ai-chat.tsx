@@ -5,6 +5,7 @@ import {Box, Typography, CircularProgress, Alert} from "@mui/material";
 import { handleUserMessage, type ChatMessage } from "~/api/chat";
 import ChatMessageList from "~/components/chat/ChatMessageList";
 import ChatInput from "~/components/chat/ChatInput";
+import RecipeFormDialog from "~/components/RecipeFormDialog";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -18,6 +19,14 @@ export default function AiChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+
+  const handleOpenRecipe = (recipeId: number) => {
+    setEditing({recipe_id: recipeId});
+    setDialogOpen(true);
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -51,7 +60,7 @@ export default function AiChatPage() {
       </Typography>
 
       <Box sx={{ flex: 1, overflowY: "auto", mb: 2 }}>
-        <ChatMessageList messages={messages} />
+        <ChatMessageList messages={messages} onSourceClick={handleOpenRecipe}/>
 
         {loading && (
           <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1 }}>
@@ -76,6 +85,14 @@ export default function AiChatPage() {
         loading={loading}
         onChange={setInput}
         onSend={handleSend}
+      />
+
+      <RecipeFormDialog
+        open={dialogOpen}
+        initial={editing}
+        onClose={() => setDialogOpen(false)}
+        onSave={async () => setDialogOpen(false)}
+        onDelete={async () => setDialogOpen(false)}
       />
     </Box>
   );

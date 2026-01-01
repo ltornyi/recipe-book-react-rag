@@ -3,7 +3,12 @@ import type { ChatMessage } from "~/api/chat";
 import UserBubble from "./UserBubble";
 import AssistantBubble from "./AssistantBubble";
 
-export default function ChatMessageList({ messages }: { messages: ChatMessage[] }) {
+interface ChatMessageListProps {
+  messages: ChatMessage[];
+  onSourceClick?: (recipeId: number) => void; // new prop
+}
+
+export default function ChatMessageList({ messages, onSourceClick }: ChatMessageListProps) {
   return (
     <Stack spacing={2}>
       {messages.map((m) => (
@@ -16,7 +21,7 @@ export default function ChatMessageList({ messages }: { messages: ChatMessage[] 
           {m.role === "user" ? (
             <UserBubble message={m} />
           ) : (
-            <AssistantBubble message={m} />
+            <AssistantBubble message={m} onSourceClick={onSourceClick}/>
           )}
         </Box>
       ))}

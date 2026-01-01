@@ -50,7 +50,17 @@ export default function RecipeFormDialog({ open, initial, onClose, onSave, onDel
       // Editing: fetch full recipe data
       setLoading(true);
       getRecipe(initial.recipe_id)
-        .then(full => setValues(full as RecipeFormValues))
+        //map to form values
+        .then(full => ({
+          recipe_id: full.recipe_id,
+          title: full.title,
+          description: full.description || '',
+          ingredients: full.ingredients,
+          steps: full.steps,
+          cuisine: full.cuisine || '',
+          is_public: full.is_public === 1,
+        } as RecipeFormValues))
+        .then(full => setValues(full))
         .catch(err => {
           console.error('Failed to load recipe', err);
           // setError(err?.message || 'Failed to load recipe');

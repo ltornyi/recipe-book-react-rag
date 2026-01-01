@@ -1,7 +1,12 @@
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import type { ChatMessage } from "~/api/chat";
 
-export default function AssistantBubble({ message }: { message: ChatMessage }) {
+interface AssistantBubbleProps {
+  message: ChatMessage;
+  onSourceClick?: (recipeId: number) => void;
+}
+
+export default function AssistantBubble({ message, onSourceClick }: AssistantBubbleProps) {
   return (
     <Paper
       elevation={1}
@@ -20,7 +25,7 @@ export default function AssistantBubble({ message }: { message: ChatMessage }) {
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
             {message.sources.map((s) => (
-              <Chip key={s.recipe_id} label={s.title} size="small" />
+              <Chip key={s.recipe_id} label={s.title} size="small" clickable onClick={() => onSourceClick?.(s.recipe_id)}/>
             ))}
           </Stack>
         </Box>
