@@ -27,7 +27,7 @@ export async function chatCompletion(request: HttpRequest, context: InvocationCo
         const { conversation, userMessage } = transformBodyToChatCompletionRequest(body);
         const response = await executeChatCompletion(conversation, userMessage, context);
 
-        return ok({ response });
+        return ok(response);
     } catch (err: any) {
         context.error("Unhandled error in chatCompletion", err);
         return serverError();

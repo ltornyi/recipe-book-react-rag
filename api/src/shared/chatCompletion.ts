@@ -40,6 +40,7 @@ export const executeChatCompletion = async (conversation: Conversation, userMess
     - Return valid JSON with:
     - "answer": string
     - "sources": array of objects. Each object in the array represents a recipe you used in your answer with the recipe id and title as attributes.
+    - Always return the JSON object only, without any additional text
 
     Recipes:
     ${recipesText}
@@ -55,6 +56,12 @@ export const executeChatCompletion = async (conversation: Conversation, userMess
 
     const resp = await generateChatCompletion(messages);
     context.log("Chat Completion Response:", resp);
-    const respJson = JSON.parse(resp);
+    //if the AI model returns invalid JSON, we need to handle that; take the response as string and add it to a JSON object:
+    let respJson;
+    try {
+        respJson = JSON.parse(resp);
+    } catch (e) {
+        respJson = JSON.parse(`{ "answer": "${resp}", "sources": [] }`);
+    }
     return respJson;
 };
