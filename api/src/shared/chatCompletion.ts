@@ -61,7 +61,9 @@ export const executeChatCompletion = async (conversation: Conversation, userMess
     try {
         respJson = JSON.parse(resp);
     } catch (e) {
-        respJson = JSON.parse(`{ "answer": "${resp}", "sources": [] }`);
+        //escape double quotes in response string
+        const escapedResp = resp.replace(/"/g, '\\"');
+        respJson = JSON.parse(`{ "answer": "${escapedResp}", "sources": [] }`);
     }
     return respJson;
 };

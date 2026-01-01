@@ -13,7 +13,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function AiChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]); // for UI display
+  const [apiConversation, setApiConversation] = useState<ChatMessage[]>([]); // for API calls
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,17 +27,18 @@ export default function AiChatPage() {
       content: input.trim(),
     };
 
+    setMessages(prev => [...prev, userMessage]);
     setInput("");
     setLoading(true);
     setError(null);
 
     try {
-      const { reformulatedUserMessage, assistantMessage } = await handleUserMessage(userMessage.content, messages);
-      setMessages(prev => [...prev, reformulatedUserMessage, assistantMessage]);
+      const { reformulatedUserMessage, assistantMessage } = await handleUserMessage(userMessage.content, apiConversation);
+      setApiConversation(prev => [...prev, reformulatedUserMessage, assistantMessage]);
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (err: any) {
       console.error("Chat failed", err);
       setError(err.message || "Chat failed");
-      setMessages(prev => [...prev, userMessage]); // Keep user message even if chat fails
     } finally {
       setLoading(false);
     }
