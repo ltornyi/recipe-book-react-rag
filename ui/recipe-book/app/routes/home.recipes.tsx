@@ -105,14 +105,44 @@ export default function RecipesPage() {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: { xs: 1, sm: 2 } }}>
       <Typography variant="h4" gutterBottom>Recipe maintenance</Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mb: 2, alignItems: 'center' }}>
-        <TextField label="Search" value={q} onChange={(e) => setQ(e.target.value)} size="small" sx={{ width: 360 }} />
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between', 
+        gap: 2, 
+        mb: 2, 
+        alignItems: { xs: 'stretch', sm: 'center' }
+      }}>
+        <TextField 
+          label="Search" 
+          value={q} 
+          onChange={(e) => setQ(e.target.value)} 
+          size="small" 
+          sx={{ 
+            width: { xs: '100%', sm: 360 },
+            flex: { xs: 1, sm: 'none' }
+          }} 
+        />
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2, 
+          alignItems: 'center',
+          justifyContent: { xs: 'space-between', sm: 'flex-end' }
+        }}>
           {loading && <CircularProgress size={24} />}
-          <Button variant="contained" onClick={() => { setEditing(null); setDialogOpen(true); }}>New Recipe</Button>
+          <Button 
+            variant="contained" 
+            onClick={() => { setEditing(null); setDialogOpen(true); }}
+            sx={{ 
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { xs: 'auto', sm: 120 }
+            }}
+          >
+            New Recipe
+          </Button>
         </Box>
       </Box>
 
@@ -127,7 +157,10 @@ export default function RecipesPage() {
         )}
 
 
-      <Paper style={{ height: 650 }}>
+      <Paper sx={{ 
+        height: { xs: 400, sm: 650 },
+        width: '100%'
+      }}>
         <DataGrid
           rows={allRecipes}
           columns={columns}

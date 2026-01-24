@@ -79,18 +79,25 @@ export default function SemanticSearchPage() {
 
   // return <Typography variant="h4">Semantic search (coming soon)</Typography>;
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: { xs: 1, sm: 2 } }}>
       <Typography variant="h4" gutterBottom>
         Semantic search
       </Typography>
 
-      <Box sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center" }}>
+      <Box sx={{ 
+        display: "flex", 
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: 2, 
+        mb: 2, 
+        alignItems: { xs: 'stretch', sm: 'center' }
+      }}>
         <TextField
           label="Search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={handleKeyPress}
           fullWidth
+          sx={{ flex: 1 }}
         />
         <TextField
           select
@@ -98,7 +105,10 @@ export default function SemanticSearchPage() {
           value={mode}
           onChange={(e) => setMode(e.target.value as any)}
           size="small"
-          sx={{ width: 120 }}
+          sx={{ 
+            width: { xs: '100%', sm: 120 },
+            minWidth: { xs: 'auto', sm: 120 }
+          }}
         >
           <MenuItem value="vector">Vector</MenuItem>
           <MenuItem value="keyword">
@@ -106,7 +116,15 @@ export default function SemanticSearchPage() {
           </MenuItem>
           <MenuItem value="hybrid">Hybrid</MenuItem>
         </TextField>
-        <Button variant="contained" onClick={handleSearch} disabled={loading}>
+        <Button 
+          variant="contained" 
+          onClick={handleSearch} 
+          disabled={loading}
+          sx={{ 
+            width: { xs: '100%', sm: 'auto' },
+            minWidth: { xs: 'auto', sm: 100 }
+          }}
+        >
           {loading ? <CircularProgress size={24} /> : "Search"}
         </Button>
       </Box>
@@ -117,7 +135,10 @@ export default function SemanticSearchPage() {
         </Alert>
       )}
 
-      <Paper style={{ height: 650 }}>
+      <Paper sx={{ 
+        height: { xs: 400, sm: 650 },
+        width: '100%'
+      }}>
         <DataGrid
           rows={results}
           columns={columns}
