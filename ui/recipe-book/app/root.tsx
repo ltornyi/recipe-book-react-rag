@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 // @ts-ignore
 import { registerSW } from "virtual:pwa-register";
 
@@ -54,10 +54,50 @@ const theme = createTheme({
 });
 
 export default function App() {
+  const [newVersion, setNewVersion] = useState(false);
+
   useEffect(() => {
-    registerSW({ immediate: true });
+    registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        setNewVersion(true);
+      }
+    });
   }, []);
-  return <ThemeProvider theme={theme}><Outlet /></ThemeProvider>;
+
+  const handleReload = () => {
+    window.location.reload();
+  };
+
+  return (
+    <>
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content="Recipe Book" />
+
+      {newVersion && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#0f172a",
+            color: "#fff",
+            padding: "10px 20px",
+            borderRadius: 8,
+            cursor: "pointer",
+            zIndex: 9999
+          }}
+          onClick={handleReload}
+        >
+          New version available. Tap to refresh.
+        </div>
+      )}
+
+      <ThemeProvider theme={theme}><Outlet /></ThemeProvider>
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
