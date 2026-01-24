@@ -9,7 +9,8 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -22,7 +23,8 @@
     "isbot": "^5.1.31",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router": "7.10.1"
+    "react-router": "7.10.1",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
     "@react-router/dev": "7.10.1",
