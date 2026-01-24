@@ -56,6 +56,8 @@ const theme = createTheme({
 export default function App() {
   const [newVersion, setNewVersion] = useState(false);
 
+  console.log("SW update test: " + new Date().toISOString());
+
   useEffect(() => {
     registerSW({
       immediate: true,
